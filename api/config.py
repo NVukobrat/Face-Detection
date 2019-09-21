@@ -37,7 +37,7 @@ YOLO_ANCHORS = np.array([
     (116, 90),
     (156, 198),
     (373, 326)
-], np.float32) / 416
+], np.float32) / TRANS_IMG_SHAPE
 
 # Yolo anchor masks
 YOLO_ANCHOR_MASKS = np.array([

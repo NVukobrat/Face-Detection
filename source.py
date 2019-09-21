@@ -63,3 +63,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# TODO: Continue: https://blog.paperspace.com/how-to-implement-a-yolo-object-detector-in-pytorch/
+# TODO: Continue: https://blog.paperspace.com/how-to-implement-a-yolo-v3-object-detector-from-scratch-in-pytorch-part-2/

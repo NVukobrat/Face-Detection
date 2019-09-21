@@ -15,7 +15,6 @@ from api.layers import (
     darknet,
     yolo_conv,
     yolo_output,
-
 )
 from api.utils import (
     yolo_boxes,
@@ -25,6 +24,23 @@ from api.utils import (
 
 def yolo_v3(size=IMG_SHAPE, channels=N_CHANNELS, anchors=YOLO_ANCHORS, masks=YOLO_ANCHOR_MASKS, classes=N_CLASSES,
             training=False):
+    """
+    In the problem of object detections, most common approach is to use
+    convolutional layers to learn the features, and then pass thoes to the
+    classifier or regressor which makes prediction/detection. On the other side
+    in YOLO, prediction is done using 1x1 convolutional layers.
+
+    Arguments:
+        size:
+        channels:
+        anchors:
+        masks:
+        classes:
+        training:
+
+    Returns:
+        Yolo network model.
+    """
     x = inputs = Input([size, size, channels])
 
     x_36, x_61, x = darknet(name='yolo_darknet')(x)

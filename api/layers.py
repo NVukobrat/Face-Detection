@@ -88,12 +88,34 @@ def yolo_conv(filters, name=None):
 
 
 def yolo_output(filters, anchors, classes, name=None):
+    """
+    Output of the YOLO is feature map since 1x1 convolutionals
+    are used instead of classifier or regressor.
+
+    Feature map consists of (B x (5 + C)) entries. B represent
+    the number of bounding boxes that each cell could predict.
+    Each of the bounding boxes has 5 + C attributes. The 5 attributes
+    represent: center coordinates (x, y), dimensions (w, h) and
+    objectness score. Furthermore, C represent class confidence for
+    each bounding box. The expectation is that each cell predict an
+    object withing coresponding bounding box.
+
+    Arguments:
+        filters:
+        anchors:
+        classes:
+        name:
+
+    Returns:
+
+    """
+
     def yolo_output_inner(x_in):
         x = inputs = Input(x_in.shape[1:])
         x = darknet_conv(x, filters * 2, 3)
         x = darknet_conv(x, anchors * (classes + 5), 1, batch_norm=False)
-        x = Lambda(lambda x: tf.reshape(x, (-1, tf.shape(x)[1], tf.shape(x)[2],
-                                            anchors, classes + 5)))(x)
+        x = Lambda(lambda x: tf.reshape(x, (-1, tf.shape(x)[1], tf.shape(x)[2], anchors, classes + 5)))(x)
+
         return Model(inputs, x, name=name)(x_in)
 
     return yolo_output_inner

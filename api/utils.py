@@ -4,10 +4,40 @@ import cv2
 
 
 def yolo_boxes(pred, anchors, classes):
+    """
+    Yolo boxes uses network output and transforms it to
+    obtaint bounding box prediction. Formulas are as following:
+
+    bx = sig(tx) + cx
+    by = sig(ty) + cy
+    bw = pw * e^tw
+    bh = ph * e^th
+
+    Where bx, by, bw and bh represent coordinates and dimensions
+    of the final prediction. Following tx, ty, tw and th is what the network
+    outputs. Then, cx and cy are top left coordinated of the grid. And lastly,
+    pw and ph represent anchors dimensions for the box. Sigmoid functions are
+    used in order to keep center coordinates prediction within the borders of
+    the bounding box.
+
+    Arguments:
+        pred:
+        anchors:
+        classes:
+
+    Returns:
+        bbox: Bounding box.
+        objectness: Probability [0, 1] that an object is contained within
+        a bounding box.
+        class_probs: Confidence score for each class (using sigmoid function,
+        not mutual exclusive objects).
+        pred_box: Original coordinates and dimensions (x, y, w, h) of
+        the predictions for loss.
+
+    """
     # pred: (batch_size, grid, grid, anchors, (x, y, w, h, obj, ...classes))
     grid_size = tf.shape(pred)[1]
-    box_xy, box_wh, objectness, class_probs = tf.split(
-        pred, (2, 2, 1, classes), axis=-1)
+    box_xy, box_wh, objectness, class_probs = tf.split(pred, (2, 2, 1, classes), axis=-1)
 
     box_xy = tf.sigmoid(box_xy)
     objectness = tf.sigmoid(objectness)
@@ -18,8 +48,7 @@ def yolo_boxes(pred, anchors, classes):
     grid = tf.meshgrid(tf.range(grid_size), tf.range(grid_size))
     grid = tf.expand_dims(tf.stack(grid, axis=-1), axis=2)  # [gx, gy, 1, 2]
 
-    box_xy = (box_xy + tf.cast(grid, tf.float32)) / \
-             tf.cast(grid_size, tf.float32)
+    box_xy = (box_xy + tf.cast(grid, tf.float32)) / tf.cast(grid_size, tf.float32)
     box_wh = tf.exp(box_wh) * anchors
 
     box_x1y1 = box_xy - box_wh / 2
@@ -30,6 +59,24 @@ def yolo_boxes(pred, anchors, classes):
 
 
 def yolo_nms(outputs, anchors, masks, classes):
+    """
+    Non-maximum Suppression solves a problem with multiple detections
+    in the same region. Namely, multiple grid could detect same objects. So,
+    NMS is used to remove thoes multiple detections.
+
+    Arguments:
+        outputs:
+        anchors:
+        masks:
+        classes:
+
+    Returns:
+        boxes:
+        scores:
+        classes:
+        valid_detections:
+
+    """
     # boxes, conf, type
     b, c, t = [], [], []
 
