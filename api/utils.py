@@ -21,9 +21,9 @@ def yolo_boxes(pred, anchors, classes):
     the bounding box.
 
     Arguments:
-        pred:
-        anchors:
-        classes:
+        pred: Network prediction using 1x1 convolutions.
+        anchors: Anchor values.
+        classes: Number of existing classes.
 
     Returns:
         bbox: Bounding box.
@@ -33,7 +33,6 @@ def yolo_boxes(pred, anchors, classes):
         not mutual exclusive objects).
         pred_box: Original coordinates and dimensions (x, y, w, h) of
         the predictions for loss.
-
     """
     # pred: (batch_size, grid, grid, anchors, (x, y, w, h, obj, ...classes))
     grid_size = tf.shape(pred)[1]
@@ -65,17 +64,17 @@ def yolo_nms(outputs, anchors, masks, classes):
     NMS is used to remove thoes multiple detections.
 
     Arguments:
-        outputs:
-        anchors:
-        masks:
-        classes:
+        outputs: Grouped outputs of the convolutional classifier (corrner coordinates,
+        objectness score, class confidence score) for each image scale (3).
+        anchors: Anchor values.
+        masks: Mask achor indexes.
+        classes: Number of existing classes.
 
     Returns:
-        boxes:
-        scores:
-        classes:
-        valid_detections:
-
+        boxes: Non-max suppressed boxes.
+        scores: Scores for the boxes.
+        classes: The class for boxes
+        valid_detections: Indicating the number of valid detections per batch item.
     """
     # boxes, conf, type
     b, c, t = [], [], []
@@ -104,6 +103,16 @@ def yolo_nms(outputs, anchors, masks, classes):
 
 
 def transform_images(x_train, size):
+    """
+    Resizes and normalizes image to the range [0, 1].
+
+    Arguments:
+        x_train: Non-normalizes image tensor.
+        size: Desired size of the image.
+
+    Returns:
+        Normalized image tensor.
+    """
     x_train = tf.image.resize(x_train, (size, size))
     x_train = x_train / 255
 
@@ -111,6 +120,17 @@ def transform_images(x_train, size):
 
 
 def draw_outputs(img, outputs, class_names):
+    """
+    Draws Yolo detection result to the original image.
+
+    Arguments:
+        img: Image where detection results will be drawn.
+        outputs: Detection results of the YoloV3 model.
+        class_names: List with existing class names.
+
+    Returns:
+        Image with market detection.
+    """
     boxes, objectness, classes, nums = outputs
     boxes, objectness, classes, nums = boxes[0], objectness[0], classes[0], nums[0]
     wh = np.flip(img.shape[0:2])

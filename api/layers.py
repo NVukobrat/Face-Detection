@@ -101,13 +101,13 @@ def yolo_output(filters, anchors, classes, name=None):
     object withing coresponding bounding box.
 
     Arguments:
-        filters:
-        anchors:
-        classes:
-        name:
+        filters: Number of convolutional filters.
+        anchors: Number of anchors that will be used.
+        classes: Number of existing classes.
+        name: Custom name of the network segment.
 
     Returns:
-
+        Yolo output model.
     """
 
     def yolo_output_inner(x_in):

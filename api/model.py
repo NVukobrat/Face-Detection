@@ -30,13 +30,31 @@ def yolo_v3(size=IMG_SHAPE, channels=N_CHANNELS, anchors=YOLO_ANCHORS, masks=YOL
     classifier or regressor which makes prediction/detection. On the other side
     in YOLO, prediction is done using 1x1 convolutional layers.
 
+    Outputs represent network prediction using 1x1 convolutions instead of
+    regullar classifier or regressor. Prediction is in the form of the
+    future map (B x (5 + C)) where:
+      - B represent number of bounding boxes that each cell (neuron) could predict
+      - 5 attributes represent:
+        - Center coordinates (x, y)
+        - Dimensions (w, h)
+        - Objectness score
+      - C represent class confidence for each bounding box
+
+    Boxes that form concreat predictions based on the network results contain:
+      - Corner cordinates (4)
+      - Objectness score (1)
+      - Confidence score of each class (80)
+      - Original coordinates and dimensions of the predictions
+      (for calculating loss). (4)
+
     Arguments:
-        size:
-        channels:
-        anchors:
-        masks:
-        classes:
-        training:
+        size: Defines input images shape. If None provided, any image
+        shape is allowed.
+        channels: Number of channels per image (1 = gray scale, 3 = RGB).
+        anchors: Desired anchors for the YoloV3 model.
+        masks: Anchor mask indexes.
+        classes: Number of existing classes.
+        training: Is this model in the training or testing/production phase.
 
     Returns:
         Yolo network model.
